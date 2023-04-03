@@ -1,0 +1,30 @@
+.R-container-1 {
+    background-color: rgb(24, 19, 44);
+    height: 500px;
+    width: 900px;
+    margin-left: 25%;
+    margin-top: 10%;
+    color: white;
+    border-radius: 15px;
+}
+
+.D1 {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    padding-left: 40px;
+}
+
+.D1 span {
+    width: 300px;
+}
+
+.opt button{
+    width: 200px;
+    height: 50px;
+    border-radius: 25px;
+    cursor: pointer;
+    margin: 10px;
+    font-size: 20px;
+    font-family: monospace;
+}

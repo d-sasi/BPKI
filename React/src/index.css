@@ -1,0 +1,57 @@
+/* * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+} */
+:root {
+  --main-color: #4ad0cc;
+  --secondary-color: #d7e3ef;
+  --box-shadow: 0 0 7px 0 var(--secondary-color);
+  --main-color-hover: #52b1ae;
+}
+body {
+  font-size: 14px;
+  color: #303030;
+  overflow-x: hidden;
+  background: beige;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+
+.title :first-child{
+  padding-left: 4%;
+  font-size: 140px;
+  -webkit-text-stroke: 1px rgb(24, 19, 44);
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+  line-height: 1;
+  text-transform: uppercase;
+  position: absolute;
+}
+
+.title :nth-child(2){
+  padding-left: 4%;
+  font-size: 140px;
+  color:rgb(24, 19, 44);
+  animation: animate 4s ease-in-out infinite;
+  margin: 0;
+  line-height: 1;
+  text-transform: uppercase;
+  position: absolute;
+}
+
+@keyframes animate {
+  0%, 100% {
+      clip-path: polygon(0% 45%, 15% 44%, 32% 50%, 54% 60%, 70% 61%, 84% 69%, 100% 52%, 100% 100%, 0% 100%);
+  }
+  50% {
+      clip-path: polygon(0% 60%, 16% 65%, 34% 66%, 51% 62%, 67% 50%, 84% 45%, 100% 46%, 100% 100%, 0% 100%);
+  }
+}
+
+
+.title :nth-child(3){
+  padding-left: 5%;
+  font-size: 15px;
+  font-family: monospace;
+  position: relative;
+}

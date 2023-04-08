@@ -32,10 +32,6 @@ const Login = () => {
 
     const toast_con = useRef(null);
 
-    const [signIn, setSignin] = useState(false);
-
-    const [signUp, setSignup] = useState(false);
-
     const validate = (event) => {
         event.preventDefault();
         seturl(event.target.id);
@@ -43,10 +39,6 @@ const Login = () => {
         setOtp(otp);
 
         const type = event.target.id;
-
-        if(type === "login") {
-            setSignin(true);
-        }
 
         let list = 0;
         if(!data.email) {
@@ -69,7 +61,6 @@ const Login = () => {
         
 
         if (type === "signup") {
-            setSignup(true);
             if (!data.name.trim()) {
                 notify("Username is Required!", "error")
                 list += 1;
@@ -90,7 +81,6 @@ const Login = () => {
         const {name, email, password} = obj;
         const data_ = {'email': email, 'OTP': Otp};
         const response = await axios.post('/emailValidation', data_);
-        console.log(response.data[0].status);
         if(response.data[0].status){
         } 
         else {
@@ -98,18 +88,32 @@ const Login = () => {
         }
     }
 
+    const checkData = async (url, data) => {
+        const response = await axios.post(`/${url}`, data);
+        return response;
+    }
+
     const submitHandler = (e) => {
         if(validate(e) === 0) {
             containerRef.current.classList.add("blur-effect");
             toast_con.current.classList.add("remove-");
             sendOtp(data);
-            setverifyEmail(true);
+
+            console.log(data);
+            if(e.target.id === "login") {
+                checkData(e.target.id, data).then(res => {
+                    if(res.data[0].status === 1)
+                        setverifyEmail(true);
+                    else
+                        notify(`${res.data[0].msg}`, "error");
+                })
+            }
+            else 
+                setverifyEmail(true);
         }
     };
 
     const changeHandler = (event) => {
-        setSignup(false);
-        setSignin(false);
         setData({ ...data, [event.target.name]: event.target.value });
     };
 
@@ -125,13 +129,11 @@ const Login = () => {
     const inputref = useRef(null);
 
     const signUpButtton = () => {
-        setSignin(false);
         setDataNull();
         containerRef.current.classList.add("right-panel-active");
     };
 
     const signInButtton = () => {
-        setSignup(false);
         setDataNull();
         containerRef.current.classList.remove("right-panel-active");
     };
@@ -184,7 +186,7 @@ const Login = () => {
     return (
         <> 
             {login}
-            {verifyEmail && <Popup OTP={Otp} data={data} url={url} setverifyEmail={setverifyEmail} con={containerRef} toast={toast_con}/>}
+            {verifyEmail && <Popup OTP={Otp} data={data} url={url} setverifyEmail={setverifyEmail} con={containerRef} toast={toast_con} setdata={setDataNull}/>}
         </>
     );
 };

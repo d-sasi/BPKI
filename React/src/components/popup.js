@@ -16,14 +16,6 @@ const Popup = (props) => {
             "inputs": [
                 {
                     "internalType": "string",
-                    "name": "",
-                    "type": "string"
-                }
-            ],
-            "name": "certificates",
-            "outputs": [
-                {
-                    "internalType": "string",
                     "name": "publicKeyHash",
                     "type": "string"
                 },
@@ -31,14 +23,11 @@ const Popup = (props) => {
                     "internalType": "string",
                     "name": "certificateHash",
                     "type": "string"
-                },
-                {
-                    "internalType": "bool",
-                    "name": "isRevoked",
-                    "type": "bool"
                 }
             ],
-            "stateMutability": "view",
+            "name": "registerCertificate",
+            "outputs": [],
+            "stateMutability": "payable",
             "type": "function"
         },
         {
@@ -50,35 +39,53 @@ const Popup = (props) => {
                 },
                 {
                     "internalType": "string",
-                    "name": "certificateHash",
+                    "name": "newCertificateHash",
                     "type": "string"
                 }
             ],
-            "name": "registerCertificate",
-            "outputs": [
+            "name": "renewCertificate",
+            "outputs": [],
+            "stateMutability": "payable",
+            "type": "function"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
                 {
+                    "indexed": false,
                     "internalType": "string",
-                    "name": "x",
+                    "name": "message",
                     "type": "string"
                 },
                 {
+                    "indexed": false,
                     "internalType": "bool",
-                    "name": "y",
+                    "name": "status",
                     "type": "bool"
                 }
             ],
-            "stateMutability": "nonpayable",
+            "name": "response",
+            "type": "event"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "publicKeyHash",
+                    "type": "string"
+                }
+            ],
+            "name": "revokeCertificate",
+            "outputs": [],
+            "stateMutability": "payable",
             "type": "function"
         }
     ]
-
-
-    const contractAddress = '0x16267b87e65e9092E4d1fB4748875c03AB6eC685';
+    
+    const contractAddress = '0xdD66F0aDD37dD73f0e5A6A0ecbbB85767807ae03';
     const contract = new web3.eth.Contract(contractABI, contractAddress);
 
     const navigate = useNavigate();
-
-    const toBytes = (string) => web3.utils.toHex(Buffer.from(string, 'utf8'));
 
     const [otp, setOtp] = useState('');
     const [focus, setFocus] = useState(0);
@@ -100,12 +107,22 @@ const Popup = (props) => {
         setOtp(otpArray.join(''));
     };
 
+    const sendAttachment = async (data, certificate_id) => {
+        const {name, email, ipaddress, domain} = props.data;
+        const data_ = {'email': email, 'certificate_id': certificate_id};
+        const response = await axios.post('/sendAttachment', data_);
+        if(response.data[0].status){
+            notify(`${response.data[0].msg}`, "success");
+        } 
+        else {
+            notify("Error! Please try again", "error");
+        }
+    }
+
     const checkData = async (url, data) => {
         const response = await axios.post(`/${url}`, data);
         console.log(response);
         if (response.data[0].status === 1) {
-            if(url === 'login')
-                navigate('/home');
             if(url === 'signup') {
                 notify(`${response.data[0].msg}`, "success")
                 navigate('/login');
@@ -114,24 +131,97 @@ const Popup = (props) => {
             const publicKeyHash = response.data[0].public_key_hash;
             const certificateHash = response.data[0].certificate_hash;
 
-            // console.log(publicKeyHash);
-            // console.log(certificateHash);
+            if(url === "Register") {
+                web3.eth.getAccounts().then(accounts => {
+                    contract.methods.registerCertificate(publicKeyHash, certificateHash).send({
+                        from: accounts[0],
+                        value: web3.utils.toWei("0.47", "ether"),
+                        gas: 3000000
+                    })
+                    .on('receipt', function(receipt) {
+                        console.log("Transaction receipt: ", receipt);
+                        const res = receipt.events.response.returnValues;
+                        if(res[1])
+                            notify(`${res[0]}`, "success");
+                        else
+                            notify(`${res[0]}`, "error");
+                    })
+                    .on('error', function(error) {
+                        console.error("Error occurred: ", error);
+                        notify("Something went wrong, Please try again!", "error");
+                    })
+                });
+            }
 
-            contract.methods.registerCertificate(publicKeyHash, certificateHash).call().then(result => {
-                console.log(result);
-            });
+            if(url === "Renew") {
+                web3.eth.getAccounts().then(accounts => {
+                    contract.methods.renewCertificate(publicKeyHash, certificateHash).send({
+                        from: accounts[0],
+                        value: web3.utils.toWei("0.03", "ether"),
+                        gas: 3000000
+                    })
+                    .on('receipt', function(receipt) {
+                        console.log("Transaction receipt: ", receipt);
+                        const res = receipt.events.response.returnValues;
+                        if(res[1]) {
+                            notify(`${res[0]}`, "success");
+                            sendAttachment(props.data, response.data[0].certificate_id);
+                        }
+                        else
+                            notify(`${res[0]}`, "error");
+                    })
+                    .on('error', function(error) {
+                        console.error("Error occurred: ", error);
+                        notify("Something went wrong, Please try again!", "error");
+                    })
+                });
+            }
+
+            if(url === "Revoke") {
+                web3.eth.getAccounts().then(accounts => {
+                    console.log(accounts);
+                    contract.methods.revokeCertificate(publicKeyHash).send({
+                        from: accounts[0],
+                        value: web3.utils.toWei("1.83", "ether"),
+                        gas: 3000000
+                    })
+                    .on('receipt', function(receipt) {
+                        console.log("Transaction receipt: ", receipt);
+                        const res = receipt.events.response.returnValues;
+                        if(res[1])
+                            notify(`${res[0]}`, "success");
+                        else
+                            notify(`${res[0]}`, "error");
+                    })
+                    .on('error', function(error) {
+                        console.error("Error occurred: ", error);
+                        notify("Something went wrong, Please try again!", "error");
+                    })
+                });
+            }
+
+
         } 
         else {
             notify(`${response.data[0].msg}`, "error");
-            props.setverifyEmail(false);
-            props.con.current.classList.remove("blur-effect");
-            props.toast.current.classList.remove("remove-");
         }
+        props.setverifyEmail(false);
+        props.con.current.classList.remove("blur-effect");
+        props.toast.current.classList.remove("remove-");
+        props.setdata();
     };
 
     const handleSubmit = () => {
         if(otp === props.OTP) {
-            checkData(props.url, props.data);
+            if(props.url != "login")
+                checkData(props.url, props.data);
+            else {
+                navigate('/home');
+                props.setverifyEmail(false);
+                props.con.current.classList.remove("blur-effect");
+                props.toast.current.classList.remove("remove-");
+                props.setdata();
+            }
         }
         else {
             notify("Incorrect OTP!", "error");
@@ -140,6 +230,8 @@ const Popup = (props) => {
 
     console.log(props.OTP);
     console.log(props.url);
+
+
     const popup = (
         <div className="popup">
             <div className="popup-container">

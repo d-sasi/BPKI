@@ -1,0 +1,43 @@
+.popup {
+    position: absolute;
+    top: 30%;
+	left: 35%;
+}
+
+.popup-container- {
+    width: 500px;
+    height: 200px;
+    background-color: white;
+    position: relative;
+    border-radius: 2%;
+    color: white;
+}
+
+.-span- {
+    font-size: 18px;
+    font-weight: bold;
+    padding-left: 15px;
+    color: rgb(24, 19, 44);
+}
+
+.-msg- {
+    position: absolute;
+    bottom: 39%;
+}
+
+.-title- {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.footer- {
+    font-size: 20px;
+    position: absolute;
+    bottom: 5%;
+    padding-left: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}

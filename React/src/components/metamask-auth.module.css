@@ -1,6 +1,8 @@
 .button {
   color: white;
-  background: -webkit-linear-gradient(left, #e5771b, #753d16);
+  /* background: -webkit-linear-gradient(left, #e5771b, #753d16); */
+  background: -webkit-linear-gradient(to left, rgb(93, 91, 99), rgb(29, 23, 54));
+  background: linear-gradient(to left, rgb(93, 91, 99), rgb(29, 23, 54));
   background-size: 200% 200%;
   border: 1px solid #dbdbdb;
   border-radius: 4px;
@@ -14,7 +16,8 @@
 }
 
 .button:hover {
-  background: -webkit-linear-gradient(left, #e5771b, #e5771b);
+  background: -webkit-linear-gradient(to left, rgb(93, 91, 99), rgb(29, 23, 54));
+  background: linear-gradient(to left, rgb(93, 91, 99), rgb(29, 23, 54));
 }
 
 .address {

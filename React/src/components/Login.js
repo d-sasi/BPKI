@@ -37,6 +37,7 @@ const Login = () => {
         seturl(event.target.id);
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         setOtp(otp);
+        sendOtp(data, otp);
 
         const type = event.target.id;
 
@@ -77,9 +78,10 @@ const Login = () => {
         return list;
     };
 
-    const sendOtp = async (obj) => {
+    const sendOtp = async (obj, otp) => {
         const {name, email, password} = obj;
-        const data_ = {'email': email, 'OTP': Otp};
+        console.log(Otp);
+        const data_ = {'email': email, 'OTP': otp};
         const response = await axios.post('/emailValidation', data_);
         if(response.data[0].status){
         } 
@@ -97,9 +99,7 @@ const Login = () => {
         if(validate(e) === 0) {
             containerRef.current.classList.add("blur-effect");
             toast_con.current.classList.add("remove-");
-            sendOtp(data);
 
-            console.log(data);
             if(e.target.id === "login") {
                 checkData(e.target.id, data).then(res => {
                     if(res.data[0].status === 1)

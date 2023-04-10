@@ -68,12 +68,12 @@ def signup():
 
     if username and password and email:  
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE username = %s OR email = %s', (username,email,))
+        cursor.execute('SELECT * FROM accounts WHERE email = %s', (email,))
         account = cursor.fetchone()
             
         if account:
             msg = [{
-                'msg': 'Account already exists!',
+                'msg': 'Account already exists with the email!',
                 'status': 0
             }]
 
@@ -138,6 +138,7 @@ def emailValidation():
             'msg' : 'Email sent successfully!',
             'status':  1
         }]
+         
     print(msg)
     return jsonify(msg)
 
